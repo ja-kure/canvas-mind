@@ -630,13 +630,13 @@
 
         cardEl.innerHTML = `
           <!-- Drag Handle Header -->
-          <div class="card-drag-handle px-3 py-1.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-slate-400 cursor-move">
-            <div class="flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+          <div class="px-3 py-1.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-slate-400 select-none">
+            <div class="card-drag-handle flex-1 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 cursor-move py-0.5">
               <i data-lucide="grip-horizontal" class="w-3.5 h-3.5 text-slate-400"></i>
               <span>카드 이동</span>
             </div>
-            <button type="button" class="btn-delete-card p-1 hover:text-rose-600 rounded-md transition" title="카드 삭제">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <button type="button" class="btn-delete-card p-1.5 hover:bg-rose-50 hover:text-rose-600 text-slate-400 rounded-md transition cursor-pointer" title="카드 삭제">
+              <i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i>
             </button>
           </div>
 
@@ -661,8 +661,16 @@
         const deleteBtn = cardEl.querySelector(".btn-delete-card");
         const changeCatBtn = cardEl.querySelector(".btn-change-cat");
 
+        // Prevent pointer/mouse down on delete button from triggering card drag or viewport pan
+        deleteBtn.addEventListener("pointerdown", (e) => {
+          e.stopPropagation();
+        });
+        deleteBtn.addEventListener("mousedown", (e) => {
+          e.stopPropagation();
+        });
         deleteBtn.addEventListener("click", (e) => {
           e.stopPropagation();
+          e.preventDefault();
           deleteCard(card.id);
         });
 
@@ -840,6 +848,7 @@
 
     // --- Delete & Edit Card ---
     function deleteCard(id) {
+      state.draggingCardId = null;
       state.cards = state.cards.filter(c => c.id !== id);
       saveState();
       renderCards();
